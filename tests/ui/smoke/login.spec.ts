@@ -12,6 +12,16 @@ test(
 );
 
 test(
+  'visual user can login',
+  { tag: ['@smoke', '@ui'] },
+  async ({ loginPage, dashboardPage }) => {
+    await loginPage.open();
+    await loginPage.login('visual_user', testUser.password);
+    await dashboardPage.verifyLoaded();
+  },
+);
+
+test(
   'invalid credentials show an error',
   { tag: ['@smoke', '@ui', '@negative'] },
   async ({ loginPage }) => {
