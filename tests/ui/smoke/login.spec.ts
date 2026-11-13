@@ -15,6 +15,7 @@ test('visual user can login', { tag: ['@smoke', '@ui'] }, async ({ loginPage, da
   await loginPage.open();
   await loginPage.login('visual_user', testUser.password);
   await dashboardPage.verifyLoaded();
+  
 });
 
 test('problem user can login', { tag: ['@smoke', '@ui'] }, async ({ loginPage, dashboardPage }) => {
