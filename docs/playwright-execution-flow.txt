@@ -1,0 +1,110 @@
+PLAYWRIGHT TEST EXECUTION FLOW
+==============================
+
+This note explains how the authenticated Chromium dashboard test runs.
+
+COMMAND
+-------
+
+Example:
+
+npx playwright test tests/ui/regression/dashboard.spec.ts --project=chromium --grep "to add and remove item in cart" --headed
+
+The file path tells Playwright which spec file to search.
+--grep selects a test by its title.
+--project=chromium selects the Chromium project in playwright.config.ts.
+--headed makes the browser window visible. It does not change the login flow.
+
+1. PLAYWRIGHT LOADS THE CONFIGURATION
+-------------------------------------
+
+Playwright reads playwright.config.ts before it runs a test. The configuration
+imports config/environment.ts, which loads the required environment settings,
+including the site's base URL and test credentials.
+
+The base URL is combined with relative paths. For example, navigating to
+/inventory.html goes to the inventory page on the configured site.
+
+2. THE CHROMIUM PROJECT REQUIRES SETUP
+--------------------------------------
+
+The "chromium" project in playwright.config.ts declares "setup" as a dependency.
+This means Playwright runs the setup project first. The setup project matches
+files ending in .setup.ts, including tests/setup/auth.setup.ts.
+
+The setup test is a separate test run that prepares browser state. It is not
+code hidden inside the dashboard test.
+
+3. SETUP LOGS IN AND SAVES AUTHENTICATION STATE
+-----------------------------------------------
+
+tests/setup/auth.setup.ts:
+
+  - Creates a LoginPage using Playwright's page fixture.
+  - Opens the site and logs in with the configured test credentials.
+  - Checks that the browser reached the inventory page.
+  - Saves the browser context's storage state to:
+    playwright/.auth/user.json
+
+That file is a generated authentication-state snapshot. It can contain
+session-related data, so do not share or commit its contents.
+
+4. CHROMIUM LOADS THE SAVED STATE
+---------------------------------
+
+The "chromium" project sets storageState to playwright/.auth/user.json.
+Playwright creates a fresh browser context for the dashboard test and loads the
+saved state into it before the test navigates to the site.
+
+The setup page and dashboard page are not the same page or browser context.
+Instead, the second context starts with the saved browser state, so the site
+recognizes the user as authenticated.
+
+5. FIXTURES CREATE PAGE OBJECTS
+-------------------------------
+
+The dashboard spec imports "test" from playwright/fixtures/auth.fixture.ts.
+That file re-exports the extended test from playwright/fixtures/base.fixture.ts.
+
+The base fixture creates page objects, such as DashboardPage and
+ShoppingCartPage, using the Playwright page for the current test. A page object
+groups page-specific locators and actions behind methods.
+
+6. THE DASHBOARD TEST RUNS
+--------------------------
+
+In tests/ui/regression/dashboard.spec.ts, the selected test currently:
+
+  - Calls dashboardPage.open(), which navigates to /inventory.html.
+  - Calls dashboardPage.verifyLoaded(), which checks the URL and verifies that
+    expected dashboard elements are visible.
+
+The test named "to add and remove item in cart" currently only opens the
+dashboard. Its body does not yet add or remove a cart item.
+
+WHY THE RUN SHOWED TWO TESTS
+----------------------------
+
+When a Chromium test depends on setup, the run includes:
+
+  1. The setup test that logs in and saves browser state.
+  2. The selected Chromium test that loads that state and runs.
+
+So "2 tests passed" means setup and the selected test both passed.
+
+CHROMIUM-PUBLIC IS DIFFERENT
+----------------------------
+
+The "chromium-public" project uses empty storage state and does not depend on
+the setup project. It is intended for tests that start signed out, such as
+login tests. The regular "chromium" project uses saved authenticated state.
+
+SHORT VERSION
+-------------
+
+Playwright loads the config
+  -> setup project logs in
+  -> setup saves browser state
+  -> Chromium loads that state into a fresh context
+  -> fixtures create page objects
+  -> the selected test opens and checks the dashboard

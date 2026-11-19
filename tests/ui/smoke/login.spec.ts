@@ -8,7 +8,7 @@ test(
     await loginPage.open();
     await loginPage.login(testUser.email, testUser.password);
     await dashboardPage.verifyLoaded();
-  },
+  }
 );
 
 test('visual user can login', { tag: ['@smoke', '@ui'] }, async ({ loginPage, dashboardPage }) => {
