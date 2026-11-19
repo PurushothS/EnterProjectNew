@@ -5,6 +5,7 @@ import { LoginPage } from '../../src/examples/demo/pages/LoginPage';
 interface UiFixtures {
   loginPage: LoginPage;
   dashboardPage: DashboardPage;
+
 }
 
 export const test = base.extend<UiFixtures>({

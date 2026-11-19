@@ -33,5 +33,7 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            allure-report/
+            allure-results/
           if-no-files-found: ignore
           retention-days: 14

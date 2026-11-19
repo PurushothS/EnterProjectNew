@@ -6,7 +6,15 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['node_modules/**', 'playwright-report/**', 'test-results/**', 'eslint.config.js'],
+    ignores: [
+      'node_modules/**',
+      'playwright-report/**',
+      'test-results/**',
+      'allure-results/**',
+      'allure-report/**',
+      'scripts/run-tests.mjs',
+      'eslint.config.js',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,

@@ -17,7 +17,7 @@ Reusable, production-oriented starter kit for isolated UI, API, and end-to-end t
 - dev/staging/prod configuration with fail-fast validation and a production safety lock
 - Chromium, Firefox, WebKit, API-only projects, parallel execution, and CI retries
 - Reusable authentication through Playwright `storageState`
-- HTML and JUnit reports plus failure screenshots, video, and traces
+- Playwright and Allure HTML reports, JUnit XML, plus failure screenshots, video, and traces
 - ESLint, Prettier, Docker, PR checks, and nightly cross-browser regression
 
 ## Tech Stack
@@ -56,6 +56,7 @@ tests/e2e/              cross-layer business flows
 
 - Node.js 20 or newer
 - npm 10 or newer
+- Java 8 or newer (required by the Allure command-line report generator)
 - Docker (optional)
 
 ## Installation
@@ -94,7 +95,7 @@ npm run test:prod
 
 ## Smoke Tests
 
-`npm run test:smoke` runs tests tagged `@smoke` on Chromium and the API project.
+`npm run test:smoke` runs tests tagged `@smoke` on Chromium and the API project. All npm test commands generate an Allure HTML report after execution, including when tests fail.
 
 ## Regression Tests
 
@@ -167,7 +168,7 @@ npx playwright show-trace test-results/artifacts/<test-folder>/trace.zip
 
 ## Reports
 
-HTML is written to `playwright-report/`; JUnit XML is written to `test-results/results.xml`. Open the HTML report with `npm run report`.
+Playwright HTML is written to `playwright-report/`; JUnit XML is written to `test-results/results.xml`; Allure results are written to `allure-results/` and its generated HTML report to `allure-report/index.html`. Open the reports with `npm run report` (Playwright) or `npm run allure:open` (Allure).
 
 ## Docker Usage
 

@@ -37,6 +37,15 @@ jobs:
           name: playwright-report
           path: playwright-report/
           if-no-files-found: ignore
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-report
+          path: |
+            allure-report/
+            allure-results/
+          if-no-files-found: ignore
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v7

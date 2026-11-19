@@ -24,4 +24,6 @@ export class DashboardPage extends BasePage {
     await expect(this.inventory).toBeVisible();
     await this.header.verifyVisible();
   }
+
+  
 }
