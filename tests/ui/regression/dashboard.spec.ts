@@ -20,5 +20,54 @@ test('to add and remove item in cart',
     await shoppingCartPage.removeRandomItemFromCart();
     expect(await shoppingCartPage.getCartAriaLabel()).toBe('Cart, empty');
   }
+);
 
-)
+test('to verify ascending order sort',
+  { tag: ['@ui'] },
+  async ({ dashboardPage }) => {
+    await dashboardPage.open();
+    await dashboardPage.selectSortOrder('az')
+    const arr: string[] = await dashboardPage.getListOfItemNames();
+    const sortedArr = [...arr].sort((a, b) => a.localeCompare(b));
+    expect(arr).toEqual(sortedArr);
+    console.log(sortedArr);
+  }
+);
+
+test('to verify descending order sort',
+  { tag: ['@ui'] },
+  async ({ dashboardPage }) => {
+    await dashboardPage.open();
+    await dashboardPage.selectSortOrder('za')
+    const arr: string[] = await dashboardPage.getListOfItemNames();
+    const sortedArr = [...arr].sort((a, b) => b.localeCompare(a));
+    expect(arr).toEqual(sortedArr);
+    console.log(sortedArr);
+  }
+);
+
+test('to verify price low to high sort',
+  { tag: ['@ui'] },
+  async ({ dashboardPage }) => {
+    await dashboardPage.open();
+    await dashboardPage.selectSortOrder('lohi')
+    const arr: number[] = await dashboardPage.getListOfItemPrices();
+    const sortedArr = [...arr].sort((a, b) => a - b);
+    expect(arr).toEqual(sortedArr);
+    console.log(sortedArr);
+  }
+);
+
+test('to verify price descending',
+  { tag: ['@ui'] },
+  async ({ dashboardPage }) => {
+    await dashboardPage.open();
+    await dashboardPage.selectSortOrder('hilo')
+    const arr: number[] = await dashboardPage.getListOfItemPrices();
+    const sortedArr = [...arr].sort((a, b) => b - a);
+    expect(arr).toEqual(sortedArr);
+    console.log(sortedArr);
+  }
+);
+
+

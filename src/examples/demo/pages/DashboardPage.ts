@@ -9,6 +9,9 @@ export class DashboardPage extends BasePage {
   readonly navigation: NavigationComponent;
   private readonly inventory: Locator;
   private readonly addToCart: Locator;
+  private readonly itemName: Locator;
+  private readonly sortDropDown: Locator;
+  private readonly itemPrice: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -16,6 +19,9 @@ export class DashboardPage extends BasePage {
     this.navigation = new NavigationComponent(page);
     this.inventory = page.getByTestId('inventory-list');
     this.addToCart = page.getByTestId(/^add-to-cart-/);
+    this.itemName = page.getByTestId('inventory-item-name');
+    this.sortDropDown = page.getByTestId('product-sort-container');
+    this.itemPrice = page.getByTestId('inventory-item-price');
   }
 
   async open(): Promise<void> {
@@ -35,5 +41,20 @@ export class DashboardPage extends BasePage {
     }
 
     await this.addToCart.nth(randomIndex(itemCount)).click();
+  }
+
+  async getListOfItemNames(): Promise<string[]> {
+    const arr: string[] = await this.itemName.allTextContents();
+    return arr;
+
+  }
+
+  async selectSortOrder(sortOrder: string): Promise<void>{
+    await this.sortDropDown.selectOption(sortOrder);
+  }
+
+  async getListOfItemPrices():Promise<number[]>{
+    const prices = await this.itemPrice.allTextContents();
+    return prices.map((price) => Number(price.replace(/[^0-9.-]/g, '')));
   }
 }
