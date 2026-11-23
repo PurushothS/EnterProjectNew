@@ -34,19 +34,34 @@ export class DashboardPage extends BasePage {
     await this.header.verifyVisible();
   }
 
-  async addRandomItemToCart(): Promise<void> {
+  async addRandomItemToCart(): Promise<{ name: string; price: number }> {
     const itemCount = await this.addToCart.count();
     if (itemCount === 0) {
       throw new Error('No add-to-cart buttons found on the dashboard.');
     }
+    const selectedButton =  this.addToCart.nth(randomIndex(itemCount));
 
-    await this.addToCart.nth(randomIndex(itemCount)).click();
+    const price = await selectedButton.locator('..').getByTestId('inventory-item-price')
+    .textContent();
+
+    const itemName = await selectedButton.locator('xpath=../..').getByTestId('inventory-item-name')
+    .textContent();
+
+    if (itemName === null || price === null) {
+      throw new Error('Could not read the selected item name or price.');
+    }
+    const addedItem = {
+      name: itemName,
+      price: Number(price.replace(/[^0-9.-]/g, '')),
+    };
+    await selectedButton.click();
+
+    return addedItem;
   }
 
   async getListOfItemNames(): Promise<string[]> {
     const arr: string[] = await this.itemName.allTextContents();
     return arr;
-
   }
 
   async selectSortOrder(sortOrder: string): Promise<void>{

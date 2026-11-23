@@ -70,4 +70,28 @@ test('to verify price descending',
   }
 );
 
+test('to verify total payment amount in cart',
+  { tag: ['@ui'] },
+  async ({ dashboardPage, shoppingCartPage }) => {
+    await dashboardPage.open();
+    const addedItems = [
+      await dashboardPage.addRandomItemToCart(),
+      await dashboardPage.addRandomItemToCart(),
+    ];
+    const itemsAdded = await dashboardPage.getListOfItemNames();
+    const itemPrice = await dashboardPage.getListOfItemPrices();
+
+    expect(itemsAdded).toHaveLength(itemPrice.length);
+    const inventoryItems = itemsAdded.map((name, index) => ({
+      name,
+      price: itemPrice[index],
+    }));
+    addedItems.forEach((item) => expect(inventoryItems).toContainEqual(item));
+
+    await shoppingCartPage.open();
+    expect(await shoppingCartPage.getCartAriaLabel()).toBe('Cart, 2 items');
+
+  }
+
+)
 
