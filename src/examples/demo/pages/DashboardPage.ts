@@ -39,13 +39,17 @@ export class DashboardPage extends BasePage {
     if (itemCount === 0) {
       throw new Error('No add-to-cart buttons found on the dashboard.');
     }
-    const selectedButton =  this.addToCart.nth(randomIndex(itemCount));
+    const selectedButton = this.addToCart.nth(randomIndex(itemCount));
 
-    const price = await selectedButton.locator('..').getByTestId('inventory-item-price')
-    .textContent();
+    const price = await selectedButton
+      .locator('..')
+      .getByTestId('inventory-item-price')
+      .textContent();
 
-    const itemName = await selectedButton.locator('xpath=../..').getByTestId('inventory-item-name')
-    .textContent();
+    const itemName = await selectedButton
+      .locator('xpath=../..')
+      .getByTestId('inventory-item-name')
+      .textContent();
 
     if (itemName === null || price === null) {
       throw new Error('Could not read the selected item name or price.');
@@ -64,11 +68,11 @@ export class DashboardPage extends BasePage {
     return arr;
   }
 
-  async selectSortOrder(sortOrder: string): Promise<void>{
+  async selectSortOrder(sortOrder: string): Promise<void> {
     await this.sortDropDown.selectOption(sortOrder);
   }
 
-  async getListOfItemPrices():Promise<number[]>{
+  async getListOfItemPrices(): Promise<number[]> {
     const prices = await this.itemPrice.allTextContents();
     return prices.map((price) => Number(price.replace(/[^0-9.-]/g, '')));
   }
