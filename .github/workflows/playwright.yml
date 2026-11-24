@@ -79,10 +79,9 @@ jobs:
           subject: 'Automated test result for sauce demo ${{ job.status }} - ${{ github.repository }}'
           html_body: |
             <h2>Test result: ${{ job.status }}</h2>
-            <p>The Allure report is attached.</p>
+            <p>Download report from</p>
             <p>
               <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">
                 View the GitHub Actions run
               </a>
             </p>
-          attachments: allure-report.zip
