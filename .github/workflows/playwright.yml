@@ -76,7 +76,7 @@ jobs:
           password: ${{ secrets.SMTP_PASSWORD }}
           from: ${{ vars.EMAIL_FROM }}
           to: ${{ vars.EMAIL_TO }}
-          subject: 'Playwright tests ${{ job.status }} - ${{ github.repository }}'
+          subject: 'Automated test result for sauce demo ${{ job.status }} - ${{ github.repository }}'
           html_body: |
             <h2>Test result: ${{ job.status }}</h2>
             <p>The Allure report is attached.</p>
