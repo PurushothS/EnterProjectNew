@@ -65,7 +65,39 @@ jobs:
           else
             echo "report_exists=false" >> "$GITHUB_OUTPUT"
           fi
+      - name: Read test counts
+        if: always()
+        id: test_counts
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
 
+          path = Path("test-results/results.xml")
+          cases = ET.parse(path).getroot().findall(".//testcase") if path.exists() else []
+
+          failed = sum(
+              case.find("failure") is not None or case.find("error") is not None
+              for case in cases
+          )
+          skipped = sum(case.find("skipped") is not None for case in cases)
+          total = len(cases)
+          passed = total - failed - skipped
+
+          passed_pct = passed * 100 // total if total else 0
+          failed_pct = failed * 100 // total if total else 0
+          skipped_pct = 100 - passed_pct - failed_pct if total else 0
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"passed={passed}\n")
+              output.write(f"failed={failed}\n")
+              output.write(f"skipped={skipped}\n")
+              output.write(f"passed_pct={passed_pct}\n")
+              output.write(f"failed_pct={failed_pct}\n")
+              output.write(f"skipped_pct={skipped_pct}\n")
+          PY
       - name: Send Allure test result email
         if: always() && steps.prepare_allure.outputs.report_exists == 'true'
         uses: dawidd6/action-send-mail@v5
@@ -79,9 +111,20 @@ jobs:
           subject: 'Automated test result for sauce demo ${{ job.status }} - ${{ github.repository }}'
           html_body: |
             <h2>Test result: ${{ job.status }}</h2>
-            <p>Download report from</p>
             <p>
-              <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">
-                View the GitHub Actions run
-              </a>
+              Passed: ${{ steps.test_counts.outputs.passed }} |
+              Failed: ${{ steps.test_counts.outputs.failed }} |
+              Skipped: ${{ steps.test_counts.outputs.skipped }}
+            </p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="${{ steps.test_counts.outputs.passed_pct }}%" height="18" bgcolor="#188038"></td>
+                <td width="${{ steps.test_counts.outputs.failed_pct }}%" height="18" bgcolor="#d93025"></td>
+                <td width="${{ steps.test_counts.outputs.skipped_pct }}%" height="18" bgcolor="#9aa0a6"></td>
+              </tr>
+            </table>
+            <p>Green = passed, red = failed, gray = skipped.</p>
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">
+              View the GitHub Actions run and download the report
+            </a>
             </p>
